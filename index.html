@@ -197,7 +197,8 @@ measurementId:
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
+console.log("Auth initialized", auth);
+alert("Firebase loaded");
 const provider = new GoogleAuthProvider();
 
 const ADMIN =
@@ -223,11 +224,21 @@ const uploadPanel =
 document.getElementById("uploadPanel");
 
 loginBtn.onclick = async () => {
+
+alert("Login button clicked");
+
 try{
+
 await signInWithRedirect(auth,provider);
+
+alert("Redirect started");
+
 }catch(error){
+
 alert(error.code + "\n" + error.message);
+
 }
+
 };
 
 logoutBtn.onclick = () => {
