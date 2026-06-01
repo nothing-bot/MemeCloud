@@ -196,7 +196,13 @@ measurementId:
 };
 
 const app = initializeApp(firebaseConfig);
+
+alert("Firebase initialized");
+console.log("Firebase initialized");
 const db = getFirestore(app);
+
+alert("Firestore initialized");
+console.log("Firestore initialized");
 console.log("Auth initialized", auth);
 alert("Firebase loaded");
 const provider = new GoogleAuthProvider();
