@@ -235,19 +235,26 @@ document.getElementById("uploadPanel");
 
 loginBtn.onclick = async () => {
 
-alert("Login button clicked");
+  alert("Login button clicked");
 
-try{
+  try {
 
-await signInWithRedirect(auth,provider);
+    alert("Starting redirect...");
 
-alert("Redirect started");
+    await signInWithRedirect(auth, provider);
 
-}catch(error){
+  } catch(error) {
 
-alert(error.code + "\n" + error.message);
+    alert(
+      "ERROR:\n" +
+      error.code +
+      "\n" +
+      error.message
+    );
 
-}
+    console.error(error);
+
+  }
 
 };
 
