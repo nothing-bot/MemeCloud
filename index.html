@@ -342,8 +342,14 @@ collection(db,"memes"),
 orderBy("createdAt","desc")
 );
 
-const snapshot =
-await getDocs(q);
+let snapshot;
+
+try{
+  snapshot = await getDocs(q);
+}catch(err){
+  alert("Firestore Error:\n" + err.message);
+  throw err;
+}
 
 snapshot.forEach((doc)=>{
 
@@ -396,7 +402,11 @@ window.open('${meme.imageUrl}')
 
 }
 
-loadMemes();
+loadMemes().catch(err=>{
+  console.error(err);
+  document.getElementById("memeContainer").innerHTML =
+    "Error: " + err.message;
+});
 
 </script>
 
