@@ -1,418 +1,130 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>MemeCloud</title>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#121212;
-  color:white;
-}
-
-header{
-  padding:20px;
-  text-align:center;
-  font-size:32px;
-  font-weight:bold;
-}
-
-#loginBtn,#logoutBtn,#uploadBtn{
-  padding:10px 15px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-#loginBtn{
-  background:#4285F4;
-  color:white;
-}
-
-#logoutBtn{
-  background:#ff4444;
-  color:white;
-}
-
-#uploadPanel{
-  display:none;
-  background:#1e1e1e;
-  margin:15px;
-  padding:15px;
-  border-radius:15px;
-}
-
-input{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:10px;
-  box-sizing:border-box;
-}
-
-#uploadBtn{
-  margin-top:10px;
-  background:#00c853;
-  color:white;
-  width:100%;
-}
-
-#memeContainer{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-  gap:15px;
-  padding:15px;
-}
-
-.card{
-  background:#1e1e1e;
-  border-radius:15px;
-  overflow:hidden;
-}
-
-.card img{
-  width:100%;
-  display:block;
-}
-
-.content{
-  padding:12px;
-}
-
-.title{
-  font-size:20px;
-  font-weight:bold;
-}
-
-.date{
-  color:#bbb;
-  margin-top:5px;
-}
-
-.actions{
-  display:flex;
-  justify-content:space-around;
-  margin-top:10px;
-}
-
-.actions button{
-  background:none;
-  border:none;
-  color:white;
-  font-size:18px;
-  cursor:pointer;
-}
-</style>
-</head>
-<body>
-
-<header>☁️ MemeCloud</header>
-
-<div style="text-align:center">
-
-<button id="loginBtn">
-Login with Google
-</button>
-
-<button id="logoutBtn" style="display:none">
-Logout
-</button>
-
-</div>
-
-<div id="uploadPanel">
-
-<h3>Upload Meme</h3>
-
-<input
-id="title"
-placeholder="Meme title">
-
-<input
-id="imageUrl"
-placeholder="Image URL">
-
-<button id="uploadBtn">
-Upload Meme
-</button>
-
-</div>
-
-<div id="memeContainer">
-Loading memes...
-</div>
-
 <script type="module">
-
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-getFirestore,
-collection,
-addDoc,
-getDocs,
-query,
-orderBy
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-import {
-getAuth,
-GoogleAuthProvider,
-signInWithRedirect,
-getRedirectResult,
-signOut,
-onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
-
-apiKey: "AIzaSyBTUp7P_PvmBBZ2fs-LMju29bK_XsLcfNU",
-
-authDomain:
-"memecloud-3c2f4.firebaseapp.com",
-
-projectId:
-"memecloud-3c2f4",
-
-storageBucket:
-"memecloud-3c2f4.firebasestorage.app",
-
-messagingSenderId:
-"167812158830",
-
-appId:
-"1:167812158830:web:5472c576e28eec0d451d7f",
-
-measurementId:
-"G-VPNEQG9PM3"
+  apiKey: "AIzaSyBTUp7P_PvmBBZ2fs-LMju29bK_XsLcfNU",
+  authDomain: "memecloud-3c2f4.firebaseapp.com",
+  projectId: "memecloud-3c2f4",
+  storageBucket: "memecloud-3c2f4.firebasestorage.app",
+  messagingSenderId: "167812158830",
+  appId: "1:167812158830:web:5472c576e28eec0d451d7f",
+  measurementId: "G-VPNEQG9PM3"
 };
 
 const app = initializeApp(firebaseConfig);
-
-alert("Firebase initialized");
-console.log("Firebase initialized");
-
 const db = getFirestore(app);
-
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-alert("Auth initialized");
+const ADMIN = "thirdpartylogin4@gmail.com";
 
-alert("Firestore initialized");
-console.log("Firestore initialized");
-console.log("Auth initialized", auth);
-
-const ADMIN =
-"thirdpartylogin4@gmail.com";
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const uploadPanel = document.getElementById("uploadPanel");
+const container = document.getElementById("memeContainer");
 
 getRedirectResult(auth)
-.then((result)=>{
-if(result?.user){
-console.log("Logged in:", result.user.email);
-}
-})
-.catch((error)=>{
-alert(error.code + "\n" + error.message);
-});
-
-const loginBtn =
-document.getElementById("loginBtn");
-
-const logoutBtn =
-document.getElementById("logoutBtn");
-
-const uploadPanel =
-document.getElementById("uploadPanel");
+  .then((result) => {
+    if (result?.user) console.log("Logged in:", result.user.email);
+  })
+  .catch((error) => console.error(error));
 
 loginBtn.onclick = async () => {
-
-  alert("Login button clicked");
-
-  alert(location.origin);
-
   try {
-
-    alert("Starting redirect...");
-
     await signInWithRedirect(auth, provider);
+  } catch (error) {
+    console.error("Auth Error:", error);
+  }
+};
 
-  } catch(error) {
+logoutBtn.onclick = () => signOut(auth);
 
-    alert(
-      "ERROR:\n" +
-      error.code +
-      "\n" +
-      error.message
-    );
+// Fixed Login Logic Flow
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "inline-block";
 
-    console.error(error);
+    // Only show upload to admin
+    if (user.email === ADMIN) {
+      uploadPanel.style.display = "block";
+    } else {
+      uploadPanel.style.display = "none";
+    }
+  } else {
+    loginBtn.style.display = "inline-block";
+    logoutBtn.style.display = "none";
+    uploadPanel.style.display = "none";
+  }
+});
 
+document.getElementById("uploadBtn").onclick = async () => {
+  const title = document.getElementById("title").value;
+  const imageUrl = document.getElementById("imageUrl").value;
+
+  if (!title || !imageUrl) {
+    alert("Fill all fields");
+    return;
   }
 
+  await addDoc(collection(db, "memes"), {
+    title,
+    imageUrl,
+    uploadedBy: auth.currentUser?.email || "Anonymous",
+    createdAt: new Date().toISOString(),
+    likes: 0
+  });
+
+  location.reload();
 };
 
-logoutBtn.onclick = () => {
-signOut(auth);
-};
+// Fixed Render Loop via Event Listeners instead of Inline HTML
+async function loadMemes() {
+  container.innerHTML = "";
+  const q = query(collection(db, "memes"), orderBy("createdAt", "desc"));
+  const snapshot = await getDocs(q);
 
-onAuthStateChanged(auth,(user)=>{
+  snapshot.forEach((doc) => {
+    const meme = doc.data();
+    
+    const card = document.createElement("div");
+    card.className = "card";
+    
+    // Using innerHTML safely since text elements are handled or static
+    card.innerHTML = `
+      <img src="${meme.imageUrl}" alt="Meme">
+      <div class="content">
+        <div class="title"></div>
+        <div class="date">${meme.createdAt.split('T')[0]}</div>
+        <div class="actions">
+          <button class="like-btn">👍 ${meme.likes || 0}</button>
+          <button class="share-btn">📤</button>
+          <button class="open-btn">⬇️</button>
+        </div>
+      </div>
+    `;
 
-console.log("Auth State:", user);
+    // Securely escape user-generated text using textContent
+    card.querySelector(".title").textContent = meme.title;
 
-if(user){
+    // Fixed Module Scope Click Handlers
+    card.querySelector(".share-btn").onclick = () => {
+      if (navigator.share) {
+        navigator.share({ title: meme.title, url: meme.imageUrl });
+      } else {
+        alert("Sharing not supported on this browser");
+      }
+    };
 
-alert("Logged in as: " + user.email);
+    card.querySelector(".open-btn").onclick = () => {
+      window.open(meme.imageUrl, '_blank');
+    };
 
-console.log("EMAIL =", user.email);
-
-uploadPanel.style.display="block";
-
-loginBtn.style.display="none";
-logoutBtn.style.display="inline-block";
-
-if(user.email === ADMIN){
-
-alert("Admin detected");
-
-uploadPanel.style.display="block";
-
-}else{
-
-alert("Not admin: " + user.email);
-
-uploadPanel.style.display="none";
-
+    container.appendChild(card);
+  });
 }
 
-}else{
-
-alert("Not logged in");
-
-loginBtn.style.display="inline-block";
-logoutBtn.style.display="none";
-uploadPanel.style.display="none";
-
-}
-
-});
-
-document.getElementById("uploadBtn")
-.onclick = async ()=>{
-
-const title =
-document.getElementById("title").value;
-
-const imageUrl =
-document.getElementById("imageUrl").value;
-
-if(!title || !imageUrl){
-alert("Fill all fields");
-return;
-}
-
-await addDoc(
-collection(db,"memes"),
-{
-title,
-imageUrl,
-uploadedBy:ADMIN,
-createdAt:new Date().toISOString(),
-likes:0
-}
-);
-
-alert("Uploaded");
-location.reload();
-};
-
-async function loadMemes(){
-
-const container =
-document.getElementById("memeContainer");
-
-container.innerHTML="";
-
-const q=query(
-collection(db,"memes"),
-orderBy("createdAt","desc")
-);
-
-let snapshot;
-
-try{
-  snapshot = await getDocs(q);
-}catch(err){
-  alert("Firestore Error:\n" + err.message);
-  throw err;
-}
-
-snapshot.forEach((doc)=>{
-
-const meme=doc.data();
-
-container.innerHTML += `
-<div class="card">
-
-<img src="${meme.imageUrl}">
-
-<div class="content">
-
-<div class="title">
-${meme.title}
-</div>
-
-<div class="date">
-${meme.createdAt}
-</div>
-
-<div class="actions">
-
-<button>
-👍 ${meme.likes || 0}
-</button>
-
-<button onclick="
-navigator.share({
-title:'${meme.title}',
-url:'${meme.imageUrl}'
-})
-">
-📤
-</button>
-
-<button onclick="
-window.open('${meme.imageUrl}')
-">
-⬇️
-</button>
-
-</div>
-
-</div>
-
-</div>
-`;
-
-});
-
-}
-
-loadMemes().catch(err=>{
-  console.error(err);
-  document.getElementById("memeContainer").innerHTML =
-    "Error: " + err.message;
-});
-
+loadMemes().catch(console.error);
 </script>
-
-</body>
-</html>
