@@ -236,16 +236,32 @@ signOut(auth);
 
 onAuthStateChanged(auth,(user)=>{
 
+console.log("Auth State:", user);
+
 if(user){
+
+alert("Logged in as: " + user.email);
 
 loginBtn.style.display="none";
 logoutBtn.style.display="inline-block";
 
-if(user.email===ADMIN){
+if(user.email === ADMIN){
+
+alert("Admin detected");
+
 uploadPanel.style.display="block";
+
+}else{
+
+alert("Not admin: " + user.email);
+
+uploadPanel.style.display="none";
+
 }
 
 }else{
+
+alert("Not logged in");
 
 loginBtn.style.display="inline-block";
 logoutBtn.style.display="none";
