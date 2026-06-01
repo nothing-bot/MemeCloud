@@ -52,6 +52,7 @@ input{
   margin-top:10px;
   border:none;
   border-radius:10px;
+  box-sizing:border-box;
 }
 
 #uploadBtn{
@@ -104,6 +105,7 @@ input{
   border:none;
   color:white;
   font-size:18px;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -163,7 +165,8 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
 getAuth,
 GoogleAuthProvider,
-signInWithPopup,
+signInWithRedirect,
+getRedirectResult,
 signOut,
 onAuthStateChanged
 }
@@ -193,15 +196,22 @@ measurementId:
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
-
 const auth = getAuth(app);
-
 const provider = new GoogleAuthProvider();
 
 const ADMIN =
 "thirdpartylogin4@gmail.com";
+
+getRedirectResult(auth)
+.then((result)=>{
+if(result?.user){
+console.log("Logged in:", result.user.email);
+}
+})
+.catch((error)=>{
+alert(error.code + "\n" + error.message);
+});
 
 const loginBtn =
 document.getElementById("loginBtn");
@@ -212,8 +222,12 @@ document.getElementById("logoutBtn");
 const uploadPanel =
 document.getElementById("uploadPanel");
 
-loginBtn.onclick = () => {
-signInWithPopup(auth,provider);
+loginBtn.onclick = async () => {
+try{
+await signInWithRedirect(auth,provider);
+}catch(error){
+alert(error.code + "\n" + error.message);
+}
 };
 
 logoutBtn.onclick = () => {
@@ -267,7 +281,6 @@ likes:0
 );
 
 alert("Uploaded");
-
 location.reload();
 };
 
@@ -321,9 +334,7 @@ url:'${meme.imageUrl}'
 </button>
 
 <button onclick="
-window.open(
-'${meme.imageUrl}'
-)
+window.open('${meme.imageUrl}')
 ">
 ⬇️
 </button>
